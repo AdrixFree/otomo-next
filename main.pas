@@ -109,6 +109,16 @@ begin
     end;
 end;
 
+procedure ReskillThread();
+begin
+    while true do
+    begin
+        if (Profession = MM_CLASS)
+        then MysticMuse.Reskill();
+        Delay(10);
+    end;
+end;
+
 ///////////////////////////////////////////////////////////
 //
 //                      MAIN FUNCTION
@@ -133,4 +143,5 @@ begin
     script.NewThread(@HoldTargetThread);
     script.NewThread(@FindAfterKillThread);
     script.NewThread(@SelfBuffThread);
+    script.NewThread(@ReskillThread);
 end.

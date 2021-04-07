@@ -11,7 +11,7 @@ unit MMAttack;
 interface
 
 uses
-    Helpers, Global, Classes, Packets;
+    Helpers, Classes, Packets, SysUtils;
 
 const
     MYSTIC_AUTO_ATTACK_RANGE_LONG = 1;
@@ -28,6 +28,9 @@ const
     MYSTIC_AUTO_ATTACK_MILI_COUNT = 1;
     MYSTIC_AUTO_ATTACK_FLASH_COUNT = 7;
 
+    MYSTIC_RESKILL_RANGE_900 = 900;
+    MYSTIC_RESKILL_RANGE_400 = 400;
+
 type
     TMysticAttack = class
     private
@@ -35,7 +38,10 @@ type
         AttackRange: integer;
         AttackStatus: boolean;
         LastTargetName: string;
+        ReskillDelay: integer;
         FlashUsers: TList;
+        ReskillRange: integer;
+        ExcludedClans: TStringList;
         SurrRangeSkills: array[1..MYSTIC_AUTO_ATTACK_RANGE_COUNT] of integer;
         LightRangeSkills: array[1..MYSTIC_AUTO_ATTACK_RANGE_COUNT] of integer;
         IceRangeSkills: array[1..MYSTIC_AUTO_ATTACK_RANGE_COUNT] of integer;
@@ -54,11 +60,15 @@ type
         procedure SetRange(range: integer);
         procedure SetType(atkType: integer);
         procedure SetAttackStatus(status: boolean);
+        procedure SetReskillDelay(del: integer);
+        procedure AddExcludedClan(clan: string);
+        procedure SetReskillRange(range: integer);
 
         constructor Create();
         procedure Attack();
         procedure AutoFlashPacket(data: pointer; size: word);
         procedure AutoFlash();
+        procedure Reskill();
     end;
 
 implementation
@@ -120,6 +130,28 @@ begin
     self.AttackStatus := status;
 end;
 
+procedure TMysticAttack.SetReskillDelay(del: integer);
+begin
+    if (del <> self.ReskillDelay)
+    then PrintBotMsg('Reskill delay: ' + IntToStr(del));
+
+    self.ReskillDelay := del;
+end;
+
+procedure TMysticAttack.SetReskillRange(range: integer);
+begin
+    if (range <> self.ReskillRange)
+    then PrintBotMsg('Reskill range: ' + IntToStr(range));
+
+    self.ReskillRange := range;
+end;
+
+procedure TMysticAttack.AddExcludedClan(clan: string);
+begin
+    PrintBotMsg('Add excluded clan: ' + clan);
+    self.ExcludedClans.Add(clan);
+end;
+
 ///////////////////////////////////////////////////////////
 //
 //                      PUBLIC FUNCTIONS
@@ -129,7 +161,9 @@ end;
 constructor TMysticAttack.Create();
 begin
     inherited;
-    FlashUsers := TList.Create();
+
+    self.FlashUsers := TList.Create();
+    self.ExcludedClans := TStringList.Create();
 
     self.SurrRangeSkills[1] := SOLAR_FLARE_SKILL;
     self.SurrRangeSkills[2] := HYDRO_BLAST_SKILL;
@@ -404,5 +438,45 @@ begin
         Delay(10);
     end;
 end;
+
+procedure TMysticAttack.Reskill();
+var
+    p1, p2: pointer;
+    enemy: TL2Live;
+    target: TL2Char;
+    i: integer;
+    excluded: boolean;
+begin
+    Engine.WaitAction([laRevive], p1, p2);
+    enemy := TL2Live(p1);
+
+    if (not UserValid())
+    then exit();
+
+    if (CharList.ByName(enemy.Name, target))
+    then begin
+        if (User.DistTo(target) <= self.ReskillRange)
+            and (not target.Dead) and (target.ClanID <> User.ClanID)
+            and (not target.IsMember) and (not User.Dead)
+        then begin
+
+            for i := 0 to ExcludedClans.Count - 1 do
+            begin
+                if (ExcludedClans[i] = target.Clan)
+                then begin
+                    excluded := true;
+                    break;
+                end;
+            end;
+
+            if (excluded)
+            then exit();
+
+            Engine.SetTarget(target);
+            Delay(self.ReskillDelay);
+        end;
+    end;
+end;
+
 
 end.

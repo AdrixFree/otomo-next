@@ -20,7 +20,7 @@ const
 type
     TMysticMuse = class
     private
-        AutoAttack: TMysticAttack;
+        Attack: TMysticAttack;
         Target: TMysticTarget;
         Buffer: TMysticBuff;
 
@@ -37,6 +37,9 @@ type
         procedure SetFastRessurection(status: boolean);
         procedure SetCrystalBuffCheck(status: boolean);
         procedure SetSelfNoblCheck(status: boolean);
+        procedure SetReskillDelay(del: integer);
+        procedure SetReskillRange(range: integer);
+        procedure AddExcludedClan(clan: string);
 
         constructor Create();
         procedure RunAutoAttack();
@@ -47,6 +50,7 @@ type
         procedure AutoFlash();
         procedure SelfBuff();
         procedure AutoFlashPacket(data: pointer; size: word);
+        procedure Reskill();
     end;
 
 var
@@ -62,17 +66,17 @@ implementation
 
 procedure TMysticMuse.SetAutoAttack(status: boolean);
 begin
-    self.AutoAttack.SetAttackStatus(status);
+    self.Attack.SetAttackStatus(status);
 end;
 
 procedure TMysticMuse.SetAutoAttackRange(range: integer);
 begin
-    self.AutoAttack.SetRange(range);
+    self.Attack.SetRange(range);
 end;
 
 procedure TMysticMuse.SetAutoAttackType(atkType: integer);
 begin
-    self.AutoAttack.SetType(atkType);
+    self.Attack.SetType(atkType);
 end;
 
 procedure TMysticMuse.SetTargetIgnoreWl(status: boolean);
@@ -123,6 +127,16 @@ begin
     self.Buffer.SetSelfNobl(status);
 end;
 
+procedure TMysticMuse.SetReskillDelay(del: integer);
+begin
+    self.Attack.SetReskillDelay(del);
+end;
+
+procedure TMysticMuse.SetReskillRange(range: integer);
+begin
+    self.Attack.SetReskillRange(range);
+end;
+
 ///////////////////////////////////////////////////////////
 //
 //                      PUBLIC FUNCTIONS
@@ -133,7 +147,7 @@ constructor TMysticMuse.Create();
 begin
     inherited;
 
-    self.AutoAttack := TMysticAttack.Create();
+    self.Attack := TMysticAttack.Create();
     self.Target := TMysticTarget.Create();
     self.Buffer := TMysticBuff.Create();
 
@@ -148,21 +162,23 @@ begin
     self.Buffer.SetCheckCancel(true);
     self.Buffer.SetCrystal(false);
     self.Buffer.SetSelfNobl(true);
+    self.Attack.SetReskillDelay(500);
+    self.Attack.SetReskillRange(MYSTIC_RESKILL_RANGE_900);
 end;
 
 procedure TMysticMuse.RunAutoAttack();
 begin
-    self.AutoAttack.Attack();
+    self.Attack.Attack();
 end;
 
 procedure TMysticMuse.AutoFlashPacket(data: pointer; size: word);
 begin
-    self.AutoAttack.AutoFlashPacket(data, size);
+    self.Attack.AutoFlashPacket(data, size);
 end;
 
 procedure TMysticMuse.AutoFlash();
 begin
-    self.AutoAttack.AutoFlash();
+    self.Attack.AutoFlash();
 end;
 
 procedure TMysticMuse.FindTarget();
@@ -192,5 +208,15 @@ begin
     self.Buffer.SelfBuff(self.Role);
 end;
 
+procedure TMysticMuse.Reskill();
+begin
+    if (Role = MM_ROLE_RADAR)
+    then self.Attack.Reskill();
+end;
+
+procedure TMysticMuse.AddExcludedClan(clan: string);
+begin
+    self.Attack.AddExcludedClan(clan);
+end;
 
 end.
