@@ -7,7 +7,7 @@
 ///////////////////////////////////////////////////////////
 
 uses
-    MM, Helpers, Back, MMAttack;
+    MM, Helpers, Back, MMAttack, Keys;
 
 var
     Profession: integer;
@@ -119,6 +119,15 @@ begin
     end;
 end;
 
+procedure KeysThread();
+begin
+    while true do
+    begin
+        Keyboard.KeysRead();
+        delay(10);
+    end;
+end;
+
 ///////////////////////////////////////////////////////////
 //
 //                      MAIN FUNCTION
@@ -135,6 +144,15 @@ begin
 
     Backlight := TBacklight.Create();
     MysticMuse := TMysticMuse.Create();
+    Keyboard := TKeyboard.Create();
+
+    Keyboard.Addkey(KEY_MM_NEXT_TARGET_ALL, 'E');
+    Keyboard.Addkey(KEY_MM_NEXT_TARGET_MM, 'W');
+    Keyboard.Addkey(KEY_MM_NEXT_TARGET_BP, 'Q');
+    Keyboard.Addkey(KEY_MM_AUTO_ATTACK_RUN, 'SPACE');
+    Keyboard.Addkey(KEY_MM_NEXT_ATTACK_RANGE, 'A');
+    Keyboard.Addkey(KEY_MM_NEXT_ATTACK_TYPE, 'S');
+    Keyboard.Addkey(KEY_MM_NEXT_ROLE, 'D');
 
     script.NewThread(@DetectProfessionThread);
     script.NewThread(@AutoAttackThread);
@@ -144,4 +162,5 @@ begin
     script.NewThread(@FindAfterKillThread);
     script.NewThread(@SelfBuffThread);
     script.NewThread(@ReskillThread);
+    script.NewThread(@KeysThread);
 end.

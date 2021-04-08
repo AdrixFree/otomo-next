@@ -27,9 +27,13 @@ type
         Role: integer;
     public
         procedure SetRole(role: integer);
+        function GetRole(): integer;
         procedure SetAutoAttack(status: boolean);
+        function GetAutoAttack(): boolean;
         procedure SetAutoAttackRange(range: integer);
-        procedure SetAutoAttackType(atkType: integer);
+        function GetAutoAttackRange(): integer;
+        function GetAutoAttackType(range: integer): integer;
+        procedure SetAutoAttackType(range: integer; atkType: integer);
         procedure SetTargetIgnoreWl(status: boolean);
         procedure SetFindAfterKill(status: boolean);
         procedure SetTargetClass(cls: integer);
@@ -38,7 +42,6 @@ type
         procedure SetCrystalBuffCheck(status: boolean);
         procedure SetSelfNoblCheck(status: boolean);
         procedure SetReskillDelay(del: integer);
-        procedure SetReskillRange(range: integer);
         procedure AddExcludedClan(clan: string);
 
         constructor Create();
@@ -69,14 +72,29 @@ begin
     self.Attack.SetAttackStatus(status);
 end;
 
+function TMysticMuse.GetAutoAttack(): boolean;
+begin
+    result := self.Attack.GetAttackStatus();
+end;
+
 procedure TMysticMuse.SetAutoAttackRange(range: integer);
 begin
     self.Attack.SetRange(range);
 end;
 
-procedure TMysticMuse.SetAutoAttackType(atkType: integer);
+function TMysticMuse.GetAutoAttackRange(): integer;
 begin
-    self.Attack.SetType(atkType);
+    result := self.Attack.GetRange();
+end;
+
+procedure TMysticMuse.SetAutoAttackType(range: integer; atkType: integer);
+begin
+    self.Attack.SetType(range, atkType);
+end;
+
+function TMysticMuse.GetAutoAttackType(range: integer): integer;
+begin
+    result := self.Attack.GetType(range);
 end;
 
 procedure TMysticMuse.SetTargetIgnoreWl(status: boolean);
@@ -107,6 +125,11 @@ begin
     self.Role := role;
 end;
 
+function TMysticMuse.GetRole(): integer;
+begin
+    result := self.Role;
+end;
+
 procedure TMysticMuse.SetCheckCancel(status: boolean);
 begin
     self.Buffer.SetCheckCancel(status);
@@ -132,11 +155,6 @@ begin
     self.Attack.SetReskillDelay(del);
 end;
 
-procedure TMysticMuse.SetReskillRange(range: integer);
-begin
-    self.Attack.SetReskillRange(range);
-end;
-
 ///////////////////////////////////////////////////////////
 //
 //                      PUBLIC FUNCTIONS
@@ -154,7 +172,8 @@ begin
     self.SetRole(MM_ROLE_RADAR);
     self.SetAutoAttack(false);
     self.SetAutoAttackRange(MYSTIC_AUTO_ATTACK_RANGE_LONG);
-    self.SetAutoAttackType(MYSTIC_AUTO_ATTACK_SURRENDER);
+    self.SetAutoAttackType(MYSTIC_AUTO_ATTACK_RANGE_LONG, MYSTIC_AUTO_ATTACK_SURRENDER);
+    self.SetAutoAttackType(MYSTIC_AUTO_ATTACK_RANGE_MILI, MYSTIC_AUTO_ATTACK_BOLT);
     self.SetTargetIgnoreWl(false);
     self.SetFindAfterKill(true);
     self.SetTargetClass(ALL_CLASS);
@@ -163,7 +182,6 @@ begin
     self.Buffer.SetCrystal(false);
     self.Buffer.SetSelfNobl(true);
     self.Attack.SetReskillDelay(500);
-    self.Attack.SetReskillRange(MYSTIC_RESKILL_RANGE_900);
 end;
 
 procedure TMysticMuse.RunAutoAttack();

@@ -227,6 +227,7 @@ begin
     if (id = 113) then result := 'TITAN' else
     if (id = 115) then result := 'OVER' else
     if (id = 110) then result := 'CX' else
+    if (id = 0) then result := 'ALL' else
     result := IntToStr(id);
 end;
 

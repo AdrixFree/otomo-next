@@ -34,7 +34,8 @@ const
 type
     TMysticAttack = class
     private
-        AttackType: integer;
+        LongAttackType: integer;
+        MiliAttackType: integer;
         AttackRange: integer;
         AttackStatus: boolean;
         LastTargetName: string;
@@ -56,13 +57,16 @@ type
         procedure SolarAutoAttack();
         procedure FlareAutoAttack();
         procedure BoltAutoAttack();
+        procedure SetReskillRange(range: integer);
     public
         procedure SetRange(range: integer);
-        procedure SetType(atkType: integer);
+        procedure SetType(range: integer; atkType: integer);
+        function GetType(range: integer): integer;
+        function GetRange(): integer;
         procedure SetAttackStatus(status: boolean);
+        function GetAttackStatus(): boolean;
         procedure SetReskillDelay(del: integer);
         procedure AddExcludedClan(clan: string);
-        procedure SetReskillRange(range: integer);
 
         constructor Create();
         procedure Attack();
@@ -89,33 +93,61 @@ begin
     if (range <> self.AttackRange)
     then begin
         if (range = MYSTIC_AUTO_ATTACK_RANGE_LONG)
-        then PrintBotMsg('Auto attack range: LONG')
+        then begin
+            PrintBotMsg('Auto attack range: LONG');
+            self.SetReskillRange(MYSTIC_RESKILL_RANGE_900);
+        end
         else if (range = MYSTIC_AUTO_ATTACK_RANGE_MILI)
-        then PrintBotMsg('Auto attack range: MILI');
+        then begin
+            PrintBotMsg('Auto attack range: MILI');
+            self.SetReskillRange(MYSTIC_RESKILL_RANGE_400);
+        end;
     end;
 
     self.AttackRange := range;
 end;
 
-procedure TMysticAttack.SetType(atkType: integer);
+procedure TMysticAttack.SetType(range: integer; atkType: integer);
 begin
-    if (atkType <> self.AttackType)
+    if (range = MYSTIC_AUTO_ATTACK_RANGE_LONG)
     then begin
-        if (atkType = MYSTIC_AUTO_ATTACK_BOLT)
-        then PrintBotMsg('Auto attack type: BOLT')
-        else if (atkType = MYSTIC_AUTO_ATTACK_FLARE)
-        then PrintBotMsg('Auto attack type: FLARE')
-        else if (atkType = MYSTIC_AUTO_ATTACK_SOLAR)
-        then PrintBotMsg('Auto attack type: SOLAR')
-        else if (atkType = MYSTIC_AUTO_ATTACK_ICE)
-        then PrintBotMsg('Auto attack type: ICE VORTEX')
-        else if (atkType = MYSTIC_AUTO_ATTACK_LIGHT)
-        then PrintBotMsg('Auto attack type: LIGHT VORTEX')
-        else if (atkType = MYSTIC_AUTO_ATTACK_SURRENDER)
-        then PrintBotMsg('Auto attack type: SURRENDER');
+        if (self.LongAttackType <> atkType)
+        then begin
+            if (atkType = MYSTIC_AUTO_ATTACK_SOLAR)
+            then PrintBotMsg('Auto attack type: SOLAR')
+            else if (atkType = MYSTIC_AUTO_ATTACK_ICE)
+            then PrintBotMsg('Auto attack type: ICE VORTEX')
+            else if (atkType = MYSTIC_AUTO_ATTACK_LIGHT)
+            then PrintBotMsg('Auto attack type: LIGHT VORTEX')
+            else if (atkType = MYSTIC_AUTO_ATTACK_SURRENDER)
+            then PrintBotMsg('Auto attack type: SURRENDER');
+        end;
+        self.LongAttackType := atkType
+    end
+    else if (range = MYSTIC_AUTO_ATTACK_RANGE_MILI)
+    then begin
+        if (self.MiliAttackType <> atkType)
+        then begin
+            if (atkType = MYSTIC_AUTO_ATTACK_BOLT)
+            then PrintBotMsg('Auto attack type: BOLT')
+            else if (atkType = MYSTIC_AUTO_ATTACK_FLARE)
+            then PrintBotMsg('Auto attack type: FLARE');
+        end;
+        self.MiliAttackType := atkType;
     end;
+end;
 
-    self.AttackType := atkType;
+function TMysticAttack.GetType(range: integer): integer;
+begin
+    if (range = MYSTIC_AUTO_ATTACK_RANGE_LONG)
+    then result := self.LongAttackType
+    else if (range = MYSTIC_AUTO_ATTACK_RANGE_MILI)
+    then result := self.MiliAttackType;
+end;
+
+function TMysticAttack.GetRange(): integer;
+begin
+    result := self.AttackRange;
 end;
 
 procedure TMysticAttack.SetAttackStatus(status: boolean);
@@ -128,6 +160,11 @@ begin
     end;
 
     self.AttackStatus := status;
+end;
+
+function TMysticAttack.GetAttackStatus(): boolean;
+begin
+    result := self.AttackStatus;
 end;
 
 procedure TMysticAttack.SetReskillDelay(del: integer);
@@ -203,20 +240,20 @@ begin
     then begin
         if (self.AttackRange = MYSTIC_AUTO_ATTACK_RANGE_LONG)
         then begin
-            if (self.AttackType = MYSTIC_AUTO_ATTACK_SURRENDER)
+            if (self.LongAttackType = MYSTIC_AUTO_ATTACK_SURRENDER)
             then self.SurrAutoAttack()
-            else if (self.AttackType = MYSTIC_AUTO_ATTACK_LIGHT)
+            else if (self.LongAttackType = MYSTIC_AUTO_ATTACK_LIGHT)
             then self.LightAutoAttack()
-            else if (self.AttackType = MYSTIC_AUTO_ATTACK_ICE)
+            else if (self.LongAttackType = MYSTIC_AUTO_ATTACK_ICE)
             then self.IceAutoAttack()
-            else if (self.AttackType = MYSTIC_AUTO_ATTACK_SOLAR)
+            else if (self.LongAttackType = MYSTIC_AUTO_ATTACK_SOLAR)
             then self.SolarAutoAttack();
         end
         else if (self.AttackRange = MYSTIC_AUTO_ATTACK_RANGE_MILI)
         then begin
-            if (self.AttackType = MYSTIC_AUTO_ATTACK_FLARE)
+            if (self.MiliAttackType = MYSTIC_AUTO_ATTACK_FLARE)
             then self.FlareAutoAttack()
-            else if (self.AttackType = MYSTIC_AUTO_ATTACK_BOLT)
+            else if (self.MiliAttackType = MYSTIC_AUTO_ATTACK_BOLT)
             then self.BoltAutoAttack()
         end;
     end;
