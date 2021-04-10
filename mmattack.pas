@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////
 //
-//                         OTOMO
+//                          OTOMO
 //               Radar + Assit for Interlude
 //                by LanGhost (c) 2020-2021
 //
@@ -42,7 +42,7 @@ type
         ReskillDelay: integer;
         FlashUsers: TList;
         ReskillRange: integer;
-        ExcludedClans: TStringList;
+        IgnoreClans: TStringList;
         SurrRangeSkills: array[1..MYSTIC_AUTO_ATTACK_RANGE_COUNT] of integer;
         LightRangeSkills: array[1..MYSTIC_AUTO_ATTACK_RANGE_COUNT] of integer;
         IceRangeSkills: array[1..MYSTIC_AUTO_ATTACK_RANGE_COUNT] of integer;
@@ -61,12 +61,12 @@ type
     public
         procedure SetRange(range: integer);
         procedure SetType(range: integer; atkType: integer);
+        procedure SetAttackStatus(status: boolean);
+        procedure SetReskillDelay(del: integer);
+        procedure AddIgnoreClan(clan: string);
         function GetType(range: integer): integer;
         function GetRange(): integer;
-        procedure SetAttackStatus(status: boolean);
         function GetAttackStatus(): boolean;
-        procedure SetReskillDelay(del: integer);
-        procedure AddExcludedClan(clan: string);
 
         constructor Create();
         procedure Attack();
@@ -183,10 +183,9 @@ begin
     self.ReskillRange := range;
 end;
 
-procedure TMysticAttack.AddExcludedClan(clan: string);
+procedure TMysticAttack.AddIgnoreClan(clan: string);
 begin
-    PrintBotMsg('Add excluded clan: ' + clan);
-    self.ExcludedClans.Add(clan);
+    self.IgnoreClans.Add(clan);
 end;
 
 ///////////////////////////////////////////////////////////
@@ -200,7 +199,7 @@ begin
     inherited;
 
     self.FlashUsers := TList.Create();
-    self.ExcludedClans := TStringList.Create();
+    self.IgnoreClans := TStringList.Create();
 
     self.SurrRangeSkills[1] := SOLAR_FLARE_SKILL;
     self.SurrRangeSkills[2] := HYDRO_BLAST_SKILL;
@@ -235,9 +234,17 @@ begin
 end;
 
 procedure TMysticAttack.Attack();
+var
+    i: integer;
 begin
     if (self.AttackStatus)
     then begin
+        for i := 0 to self.IgnoreClans.Count - 1 do
+        begin
+            if (IgnoreClans[i] = User.Target.Clan)
+            then exit();
+        end;
+
         if (self.AttackRange = MYSTIC_AUTO_ATTACK_RANGE_LONG)
         then begin
             if (self.LongAttackType = MYSTIC_AUTO_ATTACK_SURRENDER)
@@ -497,9 +504,9 @@ begin
             and (not target.IsMember) and (not User.Dead)
         then begin
 
-            for i := 0 to ExcludedClans.Count - 1 do
+            for i := 0 to IgnoreClans.Count - 1 do
             begin
-                if (ExcludedClans[i] = target.Clan)
+                if (IgnoreClans[i] = target.Clan)
                 then begin
                     excluded := true;
                     break;

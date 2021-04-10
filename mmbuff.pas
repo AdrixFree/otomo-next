@@ -34,6 +34,10 @@ type
         procedure SetCheckCancel(status: boolean);
         procedure SetCrystal(status: boolean);
         procedure SetSelfNobl(status: boolean);
+        function GetFastRes(): boolean;
+        function GetCheckCancel(): boolean;
+        function GetCrystal(): boolean;
+        function GetSelfNobl(): boolean;
 
         constructor Create();
         procedure SelfBuff(role: integer);
@@ -101,6 +105,26 @@ begin
     end;
 
     self.IsSelfNobless := status;
+end;
+
+function TMysticBuff.GetFastRes(): boolean;
+begin
+    result := self.IsFastRes;
+end;
+
+function TMysticBuff.GetCheckCancel(): boolean;
+begin
+    result := self.IsCheckCancel;
+end;
+
+function TMysticBuff.GetCrystal(): boolean;
+begin
+    result := self.IsCrystal;
+end;
+
+function TMysticBuff.GetSelfNobl(): boolean;
+begin
+    result := self.IsSelfNobless;
 end;
 
 ///////////////////////////////////////////////////////////

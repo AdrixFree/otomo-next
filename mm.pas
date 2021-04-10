@@ -27,22 +27,29 @@ type
         Role: integer;
     public
         procedure SetRole(role: integer);
-        function GetRole(): integer;
-        procedure SetAutoAttack(status: boolean);
-        function GetAutoAttack(): boolean;
-        procedure SetAutoAttackRange(range: integer);
-        function GetAutoAttackRange(): integer;
-        function GetAutoAttackType(range: integer): integer;
         procedure SetAutoAttackType(range: integer; atkType: integer);
         procedure SetTargetIgnoreWl(status: boolean);
         procedure SetFindAfterKill(status: boolean);
         procedure SetTargetClass(cls: integer);
         procedure SetCheckCancel(status: boolean);
-        procedure SetFastRessurection(status: boolean);
+        procedure SetFastResurrection(status: boolean);
         procedure SetCrystalBuffCheck(status: boolean);
-        procedure SetSelfNoblCheck(status: boolean);
+        procedure SetSelfNoblBuff(status: boolean);
         procedure SetReskillDelay(del: integer);
-        procedure AddExcludedClan(clan: string);
+        procedure AddIgnoreClan(clan: string);
+        procedure SetAutoAttack(status: boolean);
+        procedure SetAutoAttackRange(range: integer);
+        function GetRole(): integer;
+        function GetAutoAttack(): boolean;
+        function GetAutoAttackRange(): integer;
+        function GetAutoAttackType(range: integer): integer;
+        function GetTargetIgnoreWl(): boolean;
+        function GetFindAfterKill(): boolean;
+        function GetTargetClass(): integer;
+        function GetFastResurrection(): boolean;
+        function GetCheckCancel(): boolean;
+        function GetCrystalBuff(): boolean;
+        function GetSelfNoblBuff(): boolean;
 
         constructor Create();
         procedure RunAutoAttack();
@@ -135,7 +142,7 @@ begin
     self.Buffer.SetCheckCancel(status);
 end;
 
-procedure TMysticMuse.SetFastRessurection(status: boolean);
+procedure TMysticMuse.SetFastResurrection(status: boolean);
 begin
     self.Buffer.SetFastRes(status);
 end;
@@ -145,7 +152,7 @@ begin
     self.Buffer.SetCrystal(status);
 end;
 
-procedure TMysticMuse.SetSelfNoblCheck(status: boolean);
+procedure TMysticMuse.SetSelfNoblBuff(status: boolean);
 begin
     self.Buffer.SetSelfNobl(status);
 end;
@@ -153,6 +160,41 @@ end;
 procedure TMysticMuse.SetReskillDelay(del: integer);
 begin
     self.Attack.SetReskillDelay(del);
+end;
+
+function TMysticMuse.GetTargetIgnoreWl(): boolean;
+begin
+    result := self.Target.GetIgnoreWl();
+end;
+
+function TMysticMuse.GetFindAfterKill(): boolean;
+begin
+    result := self.Target.GetFindAfterKill();
+end;
+
+function TMysticMuse.GetTargetClass(): integer;
+begin
+    result := self.Target.GetClass();
+end;
+
+function TMysticMuse.GetFastResurrection(): boolean;
+begin
+    result := self.Buffer.GetFastRes();
+end;
+
+function TMysticMuse.GetCheckCancel(): boolean;
+begin
+    result := self.Buffer.GetCheckCancel();
+end;
+
+function TMysticMuse.GetCrystalBuff(): boolean;
+begin
+    result := self.Buffer.GetCrystal();
+end;
+
+function TMysticMuse.GetSelfNoblBuff(): boolean;
+begin
+    result := self.Buffer.GetSelfNobl();
 end;
 
 ///////////////////////////////////////////////////////////
@@ -232,9 +274,11 @@ begin
     then self.Attack.Reskill();
 end;
 
-procedure TMysticMuse.AddExcludedClan(clan: string);
+procedure TMysticMuse.AddIgnoreClan(clan: string);
 begin
-    self.Attack.AddExcludedClan(clan);
+    PrintBotMsg('Add ignore clan: ' + clan);
+    self.Attack.AddIgnoreClan(clan);
+    self.Target.AddIgnoreClan(clan);
 end;
 
 end.

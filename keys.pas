@@ -21,6 +21,10 @@ const
     KEY_MM_NEXT_ATTACK_RANGE = 5;
     KEY_MM_NEXT_ATTACK_TYPE = 6;
     KEY_MM_NEXT_ROLE = 7;
+    KEY_MM_IGNORE_WL = 8;
+    KEY_MM_TARGET_FIND_AFTER_KILL = 9;
+    KEY_MM_FAST_RES = 10;
+    KEY_MM_SELF_NOOBLE = 11;
 
 type
     TKey = class
@@ -51,6 +55,12 @@ implementation
 ///////////////////////////////////////////////////////////
  
 function GetAsyncKeyState(vKey: integer): integer; stdcall; external 'user32.dll';
+
+///////////////////////////////////////////////////////////
+//
+//                      PUBLIC FUNCTIONS
+//
+///////////////////////////////////////////////////////////
 
 constructor TKeyboard.Create();
 begin
@@ -129,6 +139,22 @@ begin
                     then MysticMuse.SetAutoAttackType(MYSTIC_AUTO_ATTACK_RANGE_MILI, MYSTIC_AUTO_ATTACK_BOLT)
                     else MysticMuse.SetAutoAttackType(MYSTIC_AUTO_ATTACK_RANGE_MILI, MYSTIC_AUTO_ATTACK_FLARE);
                 end;
+            end
+            else if (key = KEY_MM_IGNORE_WL)
+            then begin
+                MysticMuse.SetTargetIgnoreWl(not MysticMuse.GetTargetIgnoreWl());
+            end
+            else if (key = KEY_MM_TARGET_FIND_AFTER_KILL)
+            then begin
+                MysticMuse.SetFindAfterKill(not MysticMuse.GetFindAfterKill());
+            end
+            else if (key = KEY_MM_FAST_RES)
+            then begin
+                MysticMuse.SetFastResurrection(not MysticMuse.GetFastResurrection());
+            end
+            else if (key = KEY_MM_SELF_NOOBLE)
+            then begin
+                MysticMuse.SetSelfNoblBuff(not MysticMuse.GetSelfNoblBuff());
             end;
 
             Delay(300);

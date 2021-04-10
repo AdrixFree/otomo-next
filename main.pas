@@ -146,13 +146,18 @@ begin
     MysticMuse := TMysticMuse.Create();
     Keyboard := TKeyboard.Create();
 
-    Keyboard.Addkey(KEY_MM_NEXT_TARGET_ALL, 'E');
-    Keyboard.Addkey(KEY_MM_NEXT_TARGET_MM, 'W');
-    Keyboard.Addkey(KEY_MM_NEXT_TARGET_BP, 'Q');
+    Keyboard.Addkey(KEY_MM_NEXT_TARGET_ALL, '1');
+    Keyboard.Addkey(KEY_MM_NEXT_TARGET_MM, '2');
+    Keyboard.Addkey(KEY_MM_NEXT_TARGET_BP, '3');
+    Keyboard.Addkey(KEY_MM_NEXT_ATTACK_RANGE, '4');
+    Keyboard.Addkey(KEY_MM_FAST_RES, '5');
     Keyboard.Addkey(KEY_MM_AUTO_ATTACK_RUN, 'SPACE');
-    Keyboard.Addkey(KEY_MM_NEXT_ATTACK_RANGE, 'A');
-    Keyboard.Addkey(KEY_MM_NEXT_ATTACK_TYPE, 'S');
-    Keyboard.Addkey(KEY_MM_NEXT_ROLE, 'D');
+
+    Keyboard.Addkey(KEY_MM_NEXT_ROLE, 'F1');
+    Keyboard.Addkey(KEY_MM_IGNORE_WL, 'F2');
+    Keyboard.Addkey(KEY_MM_TARGET_FIND_AFTER_KILL, 'F3');
+    Keyboard.Addkey(KEY_MM_SELF_NOOBLE, 'F4');
+    Keyboard.Addkey(KEY_MM_NEXT_ATTACK_TYPE, 'F5');
 
     script.NewThread(@DetectProfessionThread);
     script.NewThread(@AutoAttackThread);

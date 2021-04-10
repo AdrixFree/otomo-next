@@ -11,11 +11,12 @@ unit MMTarget;
 interface
 
 uses
-     Helpers;   
+     Helpers, Classes;   
 
 type
     TMysticTarget = class
     private
+        IgnoreClans: TStringList;
         IsFindAfterKill: boolean;
         IgnoreWl: boolean;
         TargetClass: integer;
@@ -26,7 +27,12 @@ type
         procedure SetIgnoreWl(status: boolean);
         procedure SetFindAfterKill(status: boolean);
         procedure SetClass(cls: integer);
+        procedure AddIgnoreClan(clan: string);
+        function GetIgnoreWl(): boolean;
+        function GetFindAfterKill(): boolean;
+        function GetClass(): integer;
 
+        constructor Create();
         procedure FindTarget();
         procedure FindTargetAfterKill();
         procedure Hold();
@@ -40,6 +46,11 @@ implementation
 //                        PUBLIC VARS
 //
 ///////////////////////////////////////////////////////////
+
+procedure TMysticTarget.AddIgnoreClan(clan: string);
+begin
+    self.IgnoreClans.Add(clan);
+end;
 
 procedure TMysticTarget.SetIgnoreWl(status: boolean);
 begin
@@ -73,16 +84,39 @@ begin
     self.TargetClass := cls;
 end;
 
+function TMysticTarget.GetIgnoreWl(): boolean;
+begin
+    result := self.IgnoreWl;
+end;
+
+function TMysticTarget.GetFindAfterKill(): boolean;
+begin
+    result := self.IsFindAfterKill;
+end;
+
+function TMysticTarget.GetClass(): integer;
+begin
+    result := self.TargetClass;
+end;
+
 ///////////////////////////////////////////////////////////
 //
 //                      PUBLIC FUNCTIONS
 //
 ///////////////////////////////////////////////////////////
 
+constructor TMysticTarget.Create();
+begin
+    inherited;
+
+    self.IgnoreClans := TStringList.Create();
+end;
+
 procedure TMysticTarget.FindTarget();
 var
-    i: integer;
+    i, j: integer;
     target: TL2Char;
+    found: boolean;
 begin
     for i := 0 to CharList.Count - 1 do
     begin
@@ -93,6 +127,19 @@ begin
             if (not UserValid())
             then break;
 
+            // Ignore target if clan in ignore clans
+            for j := 0 to self.IgnoreClans.Count - 1 do
+            begin
+                if (self.IgnoreClans[j] = target.Clan)
+                then begin
+                    found := true;
+                    break;
+                end;
+            end;
+
+            if (found)
+            then continue;
+
             if (self.TargetClass <> ALL_CLASS)
             then begin
                 // Find concrete class
@@ -102,13 +149,13 @@ begin
                     Engine.SetTarget(target);
                     break;
                 end;
-            end
-            else begin
-                // Find all targets
-                self.LastTargetName := target.Name();
-                Engine.SetTarget(target);
-                break;
+                continue;
             end;
+
+            // Find all targets
+            self.LastTargetName := target.Name();
+            Engine.SetTarget(target);
+            break;
         end;
     end;
 end;
