@@ -128,11 +128,13 @@ begin
             then break;
 
             // Ignore target if clan in ignore clans
+            found := false;
             for j := 0 to self.IgnoreClans.Count - 1 do
             begin
                 if (self.IgnoreClans[j] = target.Clan)
                 then begin
                     found := true;
+                    PrintBotMsg('Ignore target: ' + target.Name());
                     break;
                 end;
             end;
@@ -183,6 +185,7 @@ var
     action: TL2Action;
     escBtn: boolean;
 begin
+    escBtn := false;
     action := Engine.WaitAction([laUnTarget, laKey], p1, p2);
     if (action = laUnTarget)
     then begin

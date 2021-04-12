@@ -11,7 +11,7 @@ unit MM;
 interface
 
 uses
-    MMAttack, MMTarget, Helpers, MMBuff;
+    MMAttack, MMTarget, Helpers, MMBuff, MMAssist;
 
 const
     MM_ROLE_RADAR = 1;
@@ -23,6 +23,7 @@ type
         Attack: TMysticAttack;
         Target: TMysticTarget;
         Buffer: TMysticBuff;
+        Assister: TMysticAssist;
 
         Role: integer;
     public
@@ -39,6 +40,12 @@ type
         procedure AddIgnoreClan(clan: string);
         procedure SetAutoAttack(status: boolean);
         procedure SetAutoAttackRange(range: integer);
+        procedure AddAssister(name: string);
+        procedure SetArcaneChaos(status: boolean);
+        procedure AssistAttack();
+        procedure AssistSpell();
+        procedure AssistPacket(data: pointer; size: word);
+        function GetArcaneChaos(): boolean;
         function GetRole(): integer;
         function GetAutoAttack(): boolean;
         function GetAutoAttackRange(): integer;
@@ -121,6 +128,11 @@ end;
 
 procedure TMysticMuse.SetRole(role: integer);
 begin
+    if (role = MM_ROLE_RADAR)
+    then self.Assister.SetAssistStatus(false)
+    else if (role = MM_ROLE_ASSIST)
+    then self.Assister.SetAssistStatus(true);
+
     if (role <> self.Role)
     then begin
         if (role = MM_ROLE_RADAR)
@@ -197,6 +209,21 @@ begin
     result := self.Buffer.GetSelfNobl();
 end;
 
+procedure TMysticMuse.AddAssister(name: string);
+begin
+    self.Assister.AddAssister(name);
+end;
+
+procedure TMysticMuse.SetArcaneChaos(status: boolean);
+begin
+    self.Assister.SetArcaneChaos(status);
+end;
+
+function TMysticMuse.GetArcaneChaos(): boolean;
+begin
+    result := self.Assister.GetArcaneChaos();
+end;
+
 ///////////////////////////////////////////////////////////
 //
 //                      PUBLIC FUNCTIONS
@@ -210,6 +237,7 @@ begin
     self.Attack := TMysticAttack.Create();
     self.Target := TMysticTarget.Create();
     self.Buffer := TMysticBuff.Create();
+    self.Assister := TMysticAssist.Create();
 
     self.SetRole(MM_ROLE_RADAR);
     self.SetAutoAttack(false);
@@ -224,6 +252,8 @@ begin
     self.Buffer.SetCrystal(false);
     self.Buffer.SetSelfNobl(true);
     self.Attack.SetReskillDelay(500);
+    self.Assister.SetAssistStatus(false);
+    self.Assister.SetArcaneChaos(true);
 end;
 
 procedure TMysticMuse.RunAutoAttack();
@@ -280,5 +310,24 @@ begin
     self.Attack.AddIgnoreClan(clan);
     self.Target.AddIgnoreClan(clan);
 end;
+
+procedure TMysticMuse.AssistPacket(data: pointer; size: word);
+begin
+    if (Role = MM_ROLE_ASSIST)
+    then self.Assister.AssistPacket(data, size);
+end;
+
+procedure TMysticMuse.AssistSpell();
+begin
+    if (Role = MM_ROLE_ASSIST)
+    then self.Assister.AssistSpell();
+end;
+
+procedure TMysticMuse.AssistAttack();
+begin
+    if (Role = MM_ROLE_ASSIST)
+    then self.Assister.AssistAttack();
+end;
+
 
 end.

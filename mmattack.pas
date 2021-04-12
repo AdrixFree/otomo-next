@@ -489,8 +489,10 @@ var
     enemy: TL2Live;
     target: TL2Char;
     i: integer;
-    excluded: boolean;
+    excluded: boolean;          
 begin
+    excluded := false;
+
     Engine.WaitAction([laRevive], p1, p2);
     enemy := TL2Live(p1);
 

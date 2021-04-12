@@ -26,7 +26,10 @@ begin
     if (id1 = MAGIC_SKILL_USE_PACKET)
     then begin
         if (Profession = MM_CLASS)
-        then MysticMuse.AutoFlashPacket(data, size);
+        then begin
+            MysticMuse.AutoFlashPacket(data, size);
+            MysticMuse.AssistPacket(data, size);
+        end;
     end;
 end;
 
@@ -128,6 +131,26 @@ begin
     end;
 end;
 
+procedure AssistAttackThread();
+begin
+    while true do
+    begin
+        if (Profession = MM_CLASS)
+        then MysticMuse.AssistAttack();
+        delay(300);
+    end;
+end;
+
+procedure AssistSpellThread();
+begin
+    while true do
+    begin
+        if (Profession = MM_CLASS)
+        then MysticMuse.AssistSpell();
+        delay(50);
+    end;
+end;
+
 ///////////////////////////////////////////////////////////
 //
 //                      MAIN FUNCTION
@@ -158,6 +181,7 @@ begin
     Keyboard.Addkey(KEY_MM_TARGET_FIND_AFTER_KILL, 'F3');
     Keyboard.Addkey(KEY_MM_SELF_NOOBLE, 'F4');
     Keyboard.Addkey(KEY_MM_NEXT_ATTACK_TYPE, 'F5');
+    MysticMuse.AddAssister('Cyclone');
 
     script.NewThread(@DetectProfessionThread);
     script.NewThread(@AutoAttackThread);
@@ -168,4 +192,6 @@ begin
     script.NewThread(@SelfBuffThread);
     script.NewThread(@ReskillThread);
     script.NewThread(@KeysThread);
+    script.NewThread(@AssistSpellThread);
+    script.NewThread(@AssistAttackThread);
 end.

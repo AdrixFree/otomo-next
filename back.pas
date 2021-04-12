@@ -142,7 +142,6 @@ procedure TBacklight.ShowTitle();
 var
     i, j: integer;
     target: TL2Char;
-    found: boolean;
 begin
     for i := 0 to CharList.Count - 1 do
     begin
