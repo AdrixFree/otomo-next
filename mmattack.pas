@@ -73,6 +73,7 @@ type
         procedure AutoFlashPacket(data: pointer; size: word);
         procedure AutoFlash();
         procedure Reskill();
+        procedure Cancel();
     end;
 
 implementation
@@ -81,6 +82,7 @@ const
     MYSTIC_MIN_CAST_SPD = 1671;
     MYSTIC_FLASH_SKILL_RETRIES = 20;
     MYSTIC_FLASH_DISTANCE = 200;
+    CANCEL_SKILL_RETRIES = 20;
 
 ///////////////////////////////////////////////////////////
 //
@@ -177,9 +179,6 @@ end;
 
 procedure TMysticAttack.SetReskillRange(range: integer);
 begin
-    if (range <> self.ReskillRange)
-    then PrintBotMsg('Reskill range: ' + IntToStr(range));
-
     self.ReskillRange := range;
 end;
 
@@ -521,6 +520,30 @@ begin
             Engine.SetTarget(target);
             Delay(self.ReskillDelay);
         end;
+    end;
+end;
+
+procedure TMysticAttack.Cancel();
+var
+    i: integer;
+    cancel, chaos: TL2Skill;
+begin
+    for i := 1 to CANCEL_SKILL_RETRIES do
+    begin
+        if (not UserValid())
+        then break;
+
+        delay(100);
+
+        Engine.GetSkillList.ByID(ARCANE_CHAOS_SKILL, chaos);
+        Engine.GetSkillList.ByID(CANCEL_SKILL, cancel);
+
+        if (chaos.EndTime = 0)
+        then Engine.DUseSkill(ARCANE_CHAOS_SKILL, false, false)
+        else Engine.DUseSkill(CANCEL_SKILL, false, false);
+
+        if (cancel.EndTime > 0) or (User.Target.Dead)
+        then break;
     end;
 end;
 

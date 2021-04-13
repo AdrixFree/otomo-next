@@ -30,21 +30,27 @@ type
     TMysticAssist = class
     private
         IsAssistStatus: boolean;
+        IsMoveToAss: boolean;
         AssistSpells: TList;
         PartyAssisters: TStringList;
         ArcaneChaos: boolean;
+        PosDelta: integer;
         AssistSkills: array[1..MYSTIC_ASSIST_SKILLS] of integer;
     public
         procedure AddAssister(name: string);
         procedure SetAssistStatus(status: boolean);
         procedure SetArcaneChaos(status: boolean);
+        procedure SetMoveToAssister(status: boolean);
+        procedure ClearAssisters();
         function GetArcaneChaos(): boolean;
         function GetAssistStatus(): boolean;
+        function GetMoveToAssister(): boolean;
 
         constructor Create();
         procedure AssistAttack();
         procedure AssistSpell();
         procedure AssistPacket(data: pointer; size: word);
+        procedure MoveToAssister();
     end;
 
 implementation
@@ -61,8 +67,30 @@ const
 procedure TMysticAssist.AddAssister(name: string);
 begin
     PrintBotMsg('Add assister: ' + name);
-
     self.PartyAssisters.Add(name);
+end;
+
+procedure TMysticAssist.ClearAssisters();
+begin
+    PrintBotMsg('Clear assisters list');
+    self.PartyAssisters.Clear();
+end;
+
+procedure TMysticAssist.SetMoveToAssister(status: boolean);
+begin
+    if (status <> self.IsMoveToAss)
+    then begin
+        if (status)
+        then PrintBotMsg('Move to assister: ON')
+        else PrintBotMsg('Move to assister: OFF');
+    end;
+
+    self.IsMoveToAss := status;
+end;
+
+function TMysticAssist.GetMoveToAssister(): boolean;
+begin
+    result := self.IsMoveToAss;
 end;
 
 procedure TMysticAssist.SetAssistStatus(status: boolean);
@@ -116,6 +144,8 @@ begin
     self.AssistSkills[2] := AURA_SYMPHONY_SKILL;
     self.AssistSkills[3] := SPELL_FORCE_SKILL;
     self.AssistSkills[4] := ARCANE_CHAOS_SKILL;
+
+    self.PosDelta := Random(10);
 end;
 
 procedure TMysticAssist.AssistPacket(data: pointer; size: word);
@@ -229,6 +259,27 @@ begin
                     Engine.Assist(target.Name());
                     break;
                 end;
+            end;
+        end;
+    end;
+end;
+
+procedure TMysticAssist.MoveToAssister();
+var
+    i: integer;
+    target: TL2Char;
+begin
+    for i := 0 to self.PartyAssisters.Count - 1 do
+    begin
+        if (CharList.ByName(self.PartyAssisters[i], target))
+        then begin
+            if (not target.Dead)
+            then begin
+                if (not UserValid())
+                then break;
+
+                Engine.DMoveTo(target.X - (5 + self.PosDelta), target.Y + (5 + self.PosDelta), target.Z);
+                break;
             end;
         end;
     end;

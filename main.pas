@@ -151,6 +151,16 @@ begin
     end;
 end;
 
+procedure MoveToAssistThread();
+begin
+    while true do
+    begin
+        if (Profession = MM_CLASS)
+        then MysticMuse.MoveToAssister();
+        delay(50);
+    end;
+end;
+
 ///////////////////////////////////////////////////////////
 //
 //                      MAIN FUNCTION
@@ -159,7 +169,7 @@ end;
 
 begin
     PrintBotMsg('===========================');
-    PrintBotMsg('Welcome to OTOMO');
+    PrintBotMsg('Welcome to OTOMO Next');
     PrintBotMsg('Free Radar + Assister by LanGhost');
     PrintBotMsg('https://github.com/adrixfree');
     PrintBotMsg('Change your configs in settings.ini');
@@ -172,16 +182,19 @@ begin
     Keyboard.Addkey(KEY_MM_NEXT_TARGET_ALL, '1');
     Keyboard.Addkey(KEY_MM_NEXT_TARGET_MM, '2');
     Keyboard.Addkey(KEY_MM_NEXT_TARGET_BP, '3');
-    Keyboard.Addkey(KEY_MM_NEXT_ATTACK_RANGE, '4');
+    Keyboard.Addkey(KEY_MM_NEXT_ATTACK_RANGE, 'F2');
     Keyboard.Addkey(KEY_MM_FAST_RES, '5');
     Keyboard.Addkey(KEY_MM_AUTO_ATTACK_RUN, 'SPACE');
 
     Keyboard.Addkey(KEY_MM_NEXT_ROLE, 'F1');
-    Keyboard.Addkey(KEY_MM_IGNORE_WL, 'F2');
+    Keyboard.Addkey(KEY_MM_IGNORE_WL, '4');
     Keyboard.Addkey(KEY_MM_TARGET_FIND_AFTER_KILL, 'F3');
     Keyboard.Addkey(KEY_MM_SELF_NOOBLE, 'F4');
     Keyboard.Addkey(KEY_MM_NEXT_ATTACK_TYPE, 'F5');
+    Keyboard.Addkey(KEY_MM_CANCEL, '6');
+
     MysticMuse.AddAssister('Cyclone');
+    MysticMuse.SetMoveToAssister(true);
 
     script.NewThread(@DetectProfessionThread);
     script.NewThread(@AutoAttackThread);
@@ -194,4 +207,5 @@ begin
     script.NewThread(@KeysThread);
     script.NewThread(@AssistSpellThread);
     script.NewThread(@AssistAttackThread);
+    script.NewThread(@MoveToAssistThread);
 end.

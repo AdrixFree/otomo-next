@@ -42,9 +42,9 @@ type
         procedure SetAutoAttackRange(range: integer);
         procedure AddAssister(name: string);
         procedure SetArcaneChaos(status: boolean);
-        procedure AssistAttack();
-        procedure AssistSpell();
-        procedure AssistPacket(data: pointer; size: word);
+        procedure SetMoveToAssister(status: boolean);
+        procedure ClearAssisters();
+        function GetMoveToAssister(): boolean;
         function GetArcaneChaos(): boolean;
         function GetRole(): integer;
         function GetAutoAttack(): boolean;
@@ -68,6 +68,11 @@ type
         procedure SelfBuff();
         procedure AutoFlashPacket(data: pointer; size: word);
         procedure Reskill();
+        procedure MoveToAssister();
+        procedure Cancel();
+        procedure AssistAttack();
+        procedure AssistSpell();
+        procedure AssistPacket(data: pointer; size: word);
     end;
 
 var
@@ -224,6 +229,27 @@ begin
     result := self.Assister.GetArcaneChaos();
 end;
 
+procedure TMysticMuse.SetMoveToAssister(status: boolean);
+begin
+    self.Assister.SetMoveToAssister(status);
+end;
+
+function TMysticMuse.GetMoveToAssister(): boolean;
+begin
+    result := self.Assister.GetMoveToAssister();
+end;
+
+procedure TMysticMuse.MoveToAssister();
+begin
+    if (self.Role = MM_ROLE_ASSIST)
+    then self.Assister.MoveToAssister();
+end;
+
+procedure TMysticMuse.ClearAssisters();
+begin
+    self.Assister.ClearAssisters();
+end;
+
 ///////////////////////////////////////////////////////////
 //
 //                      PUBLIC FUNCTIONS
@@ -327,6 +353,11 @@ procedure TMysticMuse.AssistAttack();
 begin
     if (Role = MM_ROLE_ASSIST)
     then self.Assister.AssistAttack();
+end;
+
+procedure TMysticMuse.Cancel();
+begin
+    self.Attack.Cancel();
 end;
 
 

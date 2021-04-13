@@ -25,6 +25,11 @@ const
     KEY_MM_TARGET_FIND_AFTER_KILL = 9;
     KEY_MM_FAST_RES = 10;
     KEY_MM_SELF_NOOBLE = 11;
+    KEY_MM_MOVE_TO_ASSISTER = 12;
+    KEY_MM_CANCEL = 13;
+    KEY_MM_ARCANE_CHAOS = 14;
+    KEY_MM_CLEAR_ASSISTER = 15;
+    KEY_MM_ADD_ASSISTER = 16;
 
 type
     TKey = class
@@ -155,6 +160,26 @@ begin
             else if (key = KEY_MM_SELF_NOOBLE)
             then begin
                 MysticMuse.SetSelfNoblBuff(not MysticMuse.GetSelfNoblBuff());
+            end
+            else if (key = KEY_MM_MOVE_TO_ASSISTER)
+            then begin
+                MysticMuse.SetMoveToAssister(not MysticMuse.GetMoveToAssister());
+            end
+            else if (key = KEY_MM_CANCEL)
+            then begin
+                MysticMuse.Cancel();
+            end
+            else if (key = KEY_MM_ARCANE_CHAOS)
+            then begin
+                MysticMuse.SetArcaneChaos(not MysticMuse.GetArcaneChaos());
+            end
+            else if (key = KEY_MM_CLEAR_ASSISTER)
+            then begin
+                MysticMuse.ClearAssisters();
+            end
+            else if (key = KEY_MM_ADD_ASSISTER)
+            then begin
+                MysticMuse.AddAssister(User.Target.Name());
             end;
 
             Delay(300);
